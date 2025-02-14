@@ -84,12 +84,7 @@ const TransferSectionItem = ({ file, fileContent, onBack }) => {
                         top: "50%",
                         transform: "translateX(-50%) translateY(-40%)",
                       }}
-                    >
-                      <TimelineProgress
-                        currentStep={currentStep} // 這邊可根據實際進度傳遞數值
-                        onNext={handleNext}
-                      />
-                    </Box>
+                    ></Box>
                   </Box>
                   <TabPanel value="original" sx={{ p: 1 }}>
                     <Box
