@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require("axios");
 const { GoogleAuth } = require("google-auth-library");
 require("dotenv").config(); // Load environment variables
+const path = require("path");
 
 // GCP Project ID
 const PROJECT_ID = "tsmccareerhack2025-tsid-grp2";
@@ -12,9 +13,9 @@ const PROJECT_ID = "tsmccareerhack2025-tsid-grp2";
  */
 async function getAccessToken() {
   const auth = new GoogleAuth({
+    keyFile: path.join(__dirname, "./key.json"), // 確保路徑正確
     scopes: "https://www.googleapis.com/auth/cloud-platform",
   });
-
   const client = await auth.getClient();
   const accessTokenResponse = await client.getAccessToken();
   return accessTokenResponse.token;
@@ -35,7 +36,6 @@ async function convertCodeWithGemini(params) {
     } = params;
 
     const accessToken = await getAccessToken();
-
     // Dynamically set LLM model endpoint
     const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/${selected_LLM}:generateContent`;
 
