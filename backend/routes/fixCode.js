@@ -48,16 +48,16 @@ ${source_code}
 `;
 
     prompt += `
-Please output the final ${source_language} code (either the original if no errors, or the corrected version if errors are present) as a markdown code block.
-Additionally, outside of the markdown code block, display the following custom markers to indicate the start and end of the code:
+Please output the final ${source_language} code (either the original if no errors, or the corrected version if errors are present) without markdown code block formatting.
+Additionally, outside of the code block, display the following custom markers to indicate the start and end of the code:
 
 // BEGIN CODE
 
-[Your markdown code block here]
+[Your code should be placed here without any additional markdown formatting such as triple backticks.]
 
 // END CODE
 
-Note: The custom markers should be separate from the markdown code block and should not be included within it.
+Note: The custom markers should be separate from any formatting and should not be wrapped in markdown syntax.
 `;
 
     // Send request to Vertex AI Gemini API
