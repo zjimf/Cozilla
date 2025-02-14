@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: b1-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: b1-1
+  template:
+    metadata:
+      labels:
+        app: b1-1
+    spec:
+      containers:
+      - name: b1-1
+        image: python:3.6
+        command: ["python", "/app/B1_1.py"]
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - name: b1-1-volume
+          mountPath: /app
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - 'import sys; sys.exit(0 if __name__ == "__main__" else 1)'  # Basic liveness check
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - 'import sys; sys.exit(0 if __name__ == "__main__" else 1)'  # Basic readiness check
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: b1-1-volume
+        configMap:
+          name: b1-1-configmap
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: b1-1-configmap
+data:
+  B1_1.py: |
+    def greet(name):
+        print(f"Hello, {name}!")
+
+    if __name__ == "__main__":
+        greet("Alice")
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: b1-1-service
+spec:
+  selector:
+    app: b1-1
+  ports:
+    - protocol: TCP
+      port: 8080  # Example port, not used by the script but good practice to include
+      targetPort: 8080 #  This also needs to be 8080 or match any exposed port in the container.
