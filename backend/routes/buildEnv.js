@@ -12,8 +12,8 @@ async function deployToCloudRun() {
     const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
 
     console.log("取得 GKE 憑證...");
-    await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
-    console.log("取得 GKE 憑證成功");
+    const getCred = await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
+    console.log(getCred);
 
     console.log("啟動 GKE Node Pool...");
     await execPromise(`gcloud container clusters resize default-pool --size=1 --zone us-central1-a --project tsmccareerhack2025-tsid-grp2 --quiet`);

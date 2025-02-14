@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: b1-1-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: b1-1
+          image: python:3.6
+          command: ["python", "/app/B1_1.py"]
+          volumeMounts:
+            - name: b1-1-volume
+              mountPath: /app
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      restartPolicy: Never
+      volumes:
+        - name: b1-1-volume
+          configMap:
+            name: b1-1-configmap
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: b1-1-configmap
+data:
+  B1_1.py: |
+    def greet(name):
+        print(f"Hello, {name}!")
+
+    if __name__ == "__main__":
+        greet("Alice")
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: b1-1-service
+spec:
+  selector:
+    # 注意：Job 不會自動建立 label，需要手動設定，如果 Service 不需要連接 Job 的 Pod，可以忽略此部分
+    app: b1-1
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
