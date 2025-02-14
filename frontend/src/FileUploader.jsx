@@ -1,38 +1,41 @@
-import { useRef } from "react";
+import { useCallback } from "react";
+import { useDropzone } from "react-dropzone";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-const FileUploader = ({ files, setFiles }) => {
-  // 使用 useState 儲存上傳的檔案陣列
-  // 使用 useRef 取得隱藏的 <input> 元件參考
-  const inputRef = useRef(null);
+const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      // 將新檔案合併進現有檔案
+      setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
 
-  /**
-   * 當使用者選擇檔案時觸發
-   * 將 FileList 轉換成陣列存入 state
-   */
-  const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-    setFiles(selectedFiles);
-  };
+      acceptedFiles.forEach((file) => {
+        const reader = new FileReader();
 
-  /**
-   * 點擊上傳按鈕時觸發隱藏的 input 點擊事件
-   */
-  const handleUploadClick = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
-    }
-  };
+        reader.onload = (event) => {
+          const fileContent = event.target.result;
+          setFileContents((prevContents) => ({
+            ...prevContents,
+            [file.name]: fileContent,
+          }));
+        };
 
-  /**
-   * 格式化檔案大小，依據大小自動換算單位
-   * @param {number} size 檔案大小（位元組）
-   */
+        reader.readAsText(file);
+      });
+    },
+    [setFiles, setFileContents]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: ".js,.py,.java,.cpp,.txt", // 允許的文件類型
+  });
+
   const formatSize = (size) => {
     if (size < 1024) {
       return size + " B";
@@ -44,25 +47,45 @@ const FileUploader = ({ files, setFiles }) => {
   };
 
   return (
-    <Box>
-      {/* 隱藏的檔案上傳 input，允許上傳任意檔案且多選 */}
-      <input
-        type="file"
-        multiple
-        ref={inputRef}
-        style={{ display: "none" }}
-        onChange={handleFileChange}
-      />
-      {/* 上傳檔案按鈕 */}
-      <Button variant="contained" onClick={handleUploadClick}>
-        上傳檔案
-      </Button>
-      {/* 顯示上傳檔案資訊 */}
-      <Box mt={2}>
-        {files?.length > 0 ? (
+    <>
+      <div
+        {...getRootProps()}
+        style={{
+          background: "#f2f2f2",
+          padding: "20px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <input {...getInputProps()} />
+        <p>拖放或點擊上傳程式碼檔案 (.js, .py, .java, .cpp, .txt)</p>
+      </div>
+      {files.length > 0 && (
+        <Box
+          sx={{
+            background: "#f2f2f2",
+            maxHeight: "200px",
+            overflowY: "auto",
+            padding: "10px",
+            position: "relative",
+          }}
+        >
           <List>
-            {files?.map((file, index) => (
-              <ListItem key={index} divider>
+            {files.map((file, index) => (
+              <ListItem
+                key={index}
+                divider
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => onDelete(file.name)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+              >
                 <ListItemText
                   primary={`檔名：${file.name}`}
                   secondary={
@@ -80,11 +103,9 @@ const FileUploader = ({ files, setFiles }) => {
               </ListItem>
             ))}
           </List>
-        ) : (
-          <Typography variant="body2">尚未上傳檔案</Typography>
-        )}
-      </Box>
-    </Box>
+        </Box>
+      )}
+    </>
   );
 };
 
