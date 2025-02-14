@@ -148,6 +148,11 @@ async function generateK8sYaml(language, version, code_snippet) {
     // confidence = JSON.parse(output).confidence
     // language = JSON.parse(output).language
 
+    // 寫入檔案
+    const path = require('path');
+    const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
+    fs.writeFileSync(yamlPath, yamlContent);  // 將 YAML 內容寫入檔案
+x``
     return yamlOutput;
   } catch (error) {
     console.error(

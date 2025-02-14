@@ -24,8 +24,8 @@ const llm = {
 
 const LLMSelector = ({ llmModals, setLlmModal }) => {
   return (
-    <Box sx={{ display: "flex", gap: 2 }}>
-      <FormControl variant="outlined" sx={{ width: "225px" }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+      <FormControl variant="outlined" sx={{ width: "150px" }}>
         <InputLabel id="models-label">Models</InputLabel>
         <Select
           labelId="models-label"

@@ -50,7 +50,7 @@ const LanguageSelector = ({ language, setLanguage, version, setVersion }) => {
 
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      <FormControl variant="outlined" sx={{ width: "150px" }}>
+      <FormControl variant="outlined" sx={{ width: "120px" }}>
         <InputLabel id="language-label">Language</InputLabel>
         <Select
           labelId="language-label"
@@ -67,7 +67,7 @@ const LanguageSelector = ({ language, setLanguage, version, setVersion }) => {
       </FormControl>
       <FormControl
         variant="outlined"
-        sx={{ width: "150px" }}
+        sx={{ width: "100px" }}
         disabled={!language}
       >
         <InputLabel

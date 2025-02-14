@@ -18,47 +18,10 @@ const FileUploadSection = ({
       <FileUploader
         files={files}
         setFiles={setFiles}
+        fileContents={fileContents}
         setFileContents={setFileContents}
         onDelete={onDelete}
       />
-
-      <Typography variant="h5" sx={{ margin: "20px 0 10px 0" }}>
-        已上傳的程式碼內容：
-      </Typography>
-      <Box
-        sx={{
-          overflowY: "auto",
-          overflowX: "auto",
-          backgroundColor: "#f5f5f5",
-          padding: "10px",
-          borderRadius: "5px",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        {Object.entries(fileContents).map(([fileName, content]) => (
-          <Box
-            key={fileName}
-            sx={{
-              backgroundColor: "#ffffff",
-              marginX: "10px",
-              padding: "10px",
-            }}
-          >
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              {fileName}
-            </Typography>
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-              }}
-            >
-              {content}
-            </pre>
-          </Box>
-        ))}
-      </Box>
     </Box>
   );
 };
