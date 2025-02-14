@@ -10,8 +10,10 @@ app.use(express.json());
 
 app.use("/transferCode", require("./routes/transferCode"));
 app.use("/buildEnv", require("./routes/buildEnv"));
+app.use("/generateYaml", require("./routes/generateYaml"));
 app.use("/deployCode", require("./routes/deployCode"));
 app.use("/testCode", require("./routes/testCode"));
+app.use("/retransferCode", require("./routes/retransferCode"));
 app.use("/fixCode", require("./routes/fixCode"));
 app.use("/improvePerf", require("./routes/improvePerf"));
 app.use("/buildReport", require("./routes/buildReport"));

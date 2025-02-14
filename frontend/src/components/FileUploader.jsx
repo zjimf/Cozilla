@@ -32,7 +32,13 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: ".js,.py,.java,.cpp,.txt", // 允許的檔案類型
+    accept: {
+      "application/javascript": [".js"],
+      "text/x-python": [".py"],
+      "text/x-java-source": [".java"],
+      "text/x-c++src": [".cpp"],
+    },
+    // 允許的檔案類型
   });
 
   const formatSize = (size) => {
