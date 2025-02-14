@@ -1,51 +1,46 @@
+// src/App.js
 import { useState } from "react";
-
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import FileUploader from "./FileUploader";
+import Slide from "@mui/material/Slide";
+import FileUploadSection from "./components/FileUploadSection";
+import TransferSection from "./components/TransferSection";
 
 const App = () => {
   const [files, setFiles] = useState([]);
+  const [fileContents, setFileContents] = useState({}); // 儲存檔案名稱與內容
+  const [step, setStep] = useState(0); // 0：上傳區塊，1：下一個區塊
 
-  /**
-   * 當使用者點擊「傳送到後端」按鈕時，會建立 FormData 並發送檔案
-   */
-  const handleSubmit = async () => {
-    if (files.length === 0) {
-      alert("請先上傳檔案再傳送！");
-      return;
-    }
+  // 切換到下一個區塊
+  const handleNext = () => {
+    setStep(1);
+  };
 
-    // 建立 FormData 物件
-    const formData = new FormData();
-    // 將每個檔案加入 FormData，假設後端的欄位名稱為 "files"
-    files.forEach((file) => {
-      formData.append("files", file);
+  // 返回上一區塊
+  const handleBack = () => {
+    setStep(0);
+  };
+
+  const handleProcess = () => {
+    alert("處理資料");
+  };
+
+  const handleDelete = (fileName) => {
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+    setFileContents((prevContents) => {
+      const newContents = { ...prevContents };
+      delete newContents[fileName];
+      return newContents;
     });
-
-    try {
-      // 請依照你的後端 API 調整 URL 與其他參數
-      const response = await fetch("http://your-backend-url/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      console.log("後端回傳結果:", result);
-      alert("上傳成功！");
-    } catch (error) {
-      console.error("上傳錯誤:", error);
-      alert("上傳失敗，請檢查後端服務是否正常。");
-    }
   };
 
   return (
     <Box
       sx={{
-        maxWidth: "100vw",
+        minWidth: "100vw",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
@@ -54,25 +49,59 @@ const App = () => {
     >
       <Card
         sx={{
-          minWidth: "90vw",
-          minHeight: "90vh",
+          width: "90vw",
+          height: "90vh",
           boxShadow:
             "rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px",
           borderRadius: "10px",
-          padding: "16px", // 加上 padding 避免內容過於貼邊
+          padding: "16px",
+          overflow: "auto",
         }}
       >
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            檔案上傳
-          </Typography>
-          {/* 引入檔案上傳元件 */}
-          <FileUploader files={files} setFiles={setFiles} />
+          {/* 上傳區塊 */}
+          <Slide direction="right" in={step === 0} mountOnEnter unmountOnExit>
+            <Box>
+              <FileUploadSection
+                files={files}
+                setFiles={setFiles}
+                fileContents={fileContents}
+                setFileContents={setFileContents}
+                onDelete={handleDelete}
+              />
+            </Box>
+          </Slide>
+
+          {/* 下一個區塊 */}
+          <Slide direction="left" in={step === 1} mountOnEnter unmountOnExit>
+            <Box>
+              <TransferSection
+                files={files}
+                fileContents={fileContents}
+                onBack={handleBack}
+                onProcess={handleProcess}
+              />
+            </Box>
+          </Slide>
         </CardContent>
-        <CardActions>
-          <Button variant="outlined" onClick={handleSubmit}>
-            Next
-          </Button>
+
+        <CardActions
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
+          {/* 在上傳區塊顯示 Next 按鈕 */}
+          {step === 0 && (
+            <Button
+              variant="outlined"
+              onClick={handleNext}
+              disabled={files.length === 0}
+            >
+              Next
+            </Button>
+          )}
         </CardActions>
       </Card>
     </Box>

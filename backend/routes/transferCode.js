@@ -2,40 +2,70 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const { GoogleAuth } = require("google-auth-library");
-require("dotenv").config(); // 讀取環境變數
+require("dotenv").config(); // Load environment variables
+const path = require("path");
 
-// Google Cloud Vertex AI API 設定
-const PROJECT_ID = "tsmccareerhack2025-tsid-grp2"; // GCP 專案 ID
-const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/gemini-1.5-pro-002:generateContent`;
+// GCP Project ID
+const PROJECT_ID = "tsmccareerhack2025-tsid-grp2";
 
 /**
- * 取得 Google Cloud API 的 Access Token
+ * Get Google Cloud API Access Token
  */
 async function getAccessToken() {
   const auth = new GoogleAuth({
+    keyFile: path.join(__dirname, "./key.json"), // 確保路徑正確
     scopes: "https://www.googleapis.com/auth/cloud-platform",
   });
-
   const client = await auth.getClient();
   const accessTokenResponse = await client.getAccessToken();
   return accessTokenResponse.token;
 }
 
 /**
- * 呼叫 Gemini API 進行對話
+ * Call Gemini API to perform code conversion
  */
-async function chatWithGemini(userMessage) {
+async function convertCodeWithGemini(params) {
   try {
+    const {
+      source_language,
+      target_language,
+      source_version,
+      target_version,
+      source_code,
+      selected_LLM,
+    } = params;
+
     const accessToken = await getAccessToken();
+    // Dynamically set LLM model endpoint
+    const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/${selected_LLM}:generateContent`;
 
-    // 設定使用者輸入的訊息
-    const prompt = `使用者: ${userMessage}\nAI: `;
+    // Construct Prompt
+    const prompt = `
+Please convert the following ${source_language} code into ${target_language} code.
+(Target version: ${target_version}; Source version: ${source_version}. If version conversion is not required, ignore version information.)
 
-    // 發送請求至 Vertex AI Gemini API
+Please follow these guidelines:
+1. Maintain the original logic and functionality of the code. The converted code should have the same output and behavior as the original.
+2. Preserve all core structures in the original code (such as loops, conditionals, and exception handling).
+3. Use only the standard libraries and syntax of the target language; do not introduce additional libraries or tools.
+4. If version conversion is involved, avoid using features or syntax that are unsupported in the target version. Provide an alternative implementation for features available only in ${target_version} or later.
+5. Follow best practices and coding styles for the target language (e.g., Pythonic style for Python, conventional Java coding conventions).
+6. If there are syntax or functional differences that cannot be directly translated, suggest reasonable alternatives or equivalent implementations.
+7. Enclose the final output code within the following custom markers:
+   - Code Start Marker: \`// BEGIN CODE\`
+   - Code End Marker: \`// END CODE\`
+
+Original ${source_language} code:
+${source_code}
+
+Please provide the equivalent ${target_language} code:
+    `;
+
+    // Send request to Vertex AI Gemini API
     const response = await axios.post(
       MODEL_ENDPOINT,
       {
-        contents: [{ role: "user", parts: [{ text: prompt }] }], // Google Gemini API 的內容格式
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
       },
       {
         headers: {
@@ -45,31 +75,45 @@ async function chatWithGemini(userMessage) {
       }
     );
 
-    // 取得 LLM 產生的回應
+    // Retrieve LLM-generated converted code
     const output =
-      response.data.candidates[0]?.content?.parts[0]?.text || "無回應";
+      response.data.candidates[0]?.content?.parts[0]?.text || "No response";
 
     return output;
   } catch (error) {
-    console.error(
-      "呼叫 Gemini API 時發生錯誤:",
-      error.response?.data || error.message
-    );
-    throw new Error("GCP Gemini API 呼叫失敗");
+    console.error("Error calling  API:", error.response?.data || error.message);
+    throw new Error("GCP API call failed");
   }
 }
 
-// **API 路由 - 與 Gemini LLM 進行對話**
+// **API Route - Convert Code**
 router.post("/", async (req, res) => {
-  const { message } = req.body;
+  const {
+    source_language,
+    target_language,
+    source_version,
+    target_version,
+    source_code,
+    selected_LLM,
+  } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: "請提供 message 來與 LLM 對話" });
+  // Validate required parameters
+  if (!source_code || !source_language || !target_language || !selected_LLM) {
+    return res
+      .status(400)
+      .json({ error: "Please provide all required parameters" });
   }
 
   try {
-    const output = await chatWithGemini(message);
-    res.json({ message: "對話成功", response: output });
+    const output = await convertCodeWithGemini({
+      source_language,
+      target_language,
+      source_version,
+      target_version,
+      source_code,
+      selected_LLM,
+    });
+    res.json({ message: "Code conversion successful", output });
   } catch (err) {
     res.status(500).json({ error: err.toString() });
   }
