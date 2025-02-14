@@ -24,14 +24,13 @@ const TransferSectionItem = ({ file, fileContent, onBack }) => {
 
   const [currentStep, setCurrentStep] = useState(0);
 
+  const [convertedCode, setConvertedCode] = useState("");
+
   const handleNext = () => {
     if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1);
     }
   };
-
-  // 暫時使用與原始程式碼相同的轉換結果（後續可替換成真正轉換結果）
-  const convertedCode = "converted \n" + fileContent;
 
   const handleChipClick = () => {
     console.info("You clicked the Chip for", file.name);
@@ -55,7 +54,10 @@ const TransferSectionItem = ({ file, fileContent, onBack }) => {
           <Grid container columnSpacing={2}>
             <Grid item xs={3.5}>
               <Item sx={{ minHeight: "420px" }}>
-                <ProcessSectionSetting />
+                <ProcessSectionSetting
+                  fileContent={fileContent}
+                  setConvertedCode={setConvertedCode}
+                />
               </Item>
             </Grid>
             <Grid item xs={8.5}>

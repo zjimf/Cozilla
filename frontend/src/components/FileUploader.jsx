@@ -9,7 +9,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
+const FileUploader = ({
+  files,
+  setFiles,
+  fileContents,
+  setFileContents,
+  onDelete,
+}) => {
   const onDrop = useCallback(
     (acceptedFiles) => {
       // 合併新上傳的檔案，不覆蓋舊檔案
