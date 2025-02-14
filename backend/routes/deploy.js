@@ -9,7 +9,7 @@ router.use(bodyParser.json());
 
 async function deployToKubernetes() {
   try {
-    const yamlPath = path.join(__dirname, 'generated_yaml/generated_yaml.yaml');
+    const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
 
     console.log("取得 GKE 憑證...");
     const getCred = await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
