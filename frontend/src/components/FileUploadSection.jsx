@@ -22,7 +22,7 @@ const FileUploadSection = ({
         onDelete={onDelete}
       />
 
-      <Typography variant="h5" sx={{ marginTop: "20px" }}>
+      <Typography variant="h5" sx={{ margin: "20px 0 10px 0" }}>
         已上傳的程式碼內容：
       </Typography>
       <Box

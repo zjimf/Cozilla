@@ -1,4 +1,3 @@
-// src/App.js
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -7,7 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Slide from "@mui/material/Slide";
 import FileUploadSection from "./components/FileUploadSection";
-import TransferSection from "./components/TransferSection";
+import ProcessSection from "./components/ProcessSection";
 
 const App = () => {
   const [files, setFiles] = useState([]);
@@ -22,10 +21,6 @@ const App = () => {
   // 返回上一區塊
   const handleBack = () => {
     setStep(0);
-  };
-
-  const handleProcess = () => {
-    alert("處理資料");
   };
 
   const handleDelete = (fileName) => {
@@ -75,11 +70,10 @@ const App = () => {
           {/* 下一個區塊 */}
           <Slide direction="left" in={step === 1} mountOnEnter unmountOnExit>
             <Box>
-              <TransferSection
+              <ProcessSection
                 files={files}
                 fileContents={fileContents}
                 onBack={handleBack}
-                onProcess={handleProcess}
               />
             </Box>
           </Slide>
