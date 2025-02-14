@@ -2,8 +2,14 @@ import { useState } from "react";
 import { Stack, Typography, Button, Box } from "@mui/material";
 import LanguageSelector from "./LanguageSelector.jsx";
 import LLMSelector from "./LLMSelector.jsx";
+import axios from "axios";
+import { extractCode } from "../functions/extractCode.js";
 
-const ProcessSectionRenderContent = ({ active }) => {
+const ProcessSectionRenderContent = ({
+  fileContent,
+  setConvertedCode,
+  active,
+}) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [sourceVersion, setSourceVersion] = useState("");
   const [targetLanguage, setTargetLanguage] = useState("");
@@ -16,8 +22,57 @@ const ProcessSectionRenderContent = ({ active }) => {
     llmModal &&
     (active !== 1 || (targetLanguage && targetVersion));
 
-  const handleGo = () => {
-    // 在此可以處理下一步的邏輯，例如傳遞參數到下一個區塊或進行 API 呼叫
+  const handleGo = async () => {
+    const requestDataTransfer = {
+      source_language: sourceLanguage,
+      target_language: targetLanguage,
+      source_version: sourceVersion,
+      target_version: targetVersion,
+      source_code: fileContent,
+      selected_LLM: llmModal,
+    };
+    const requestDataOptimize = {
+      source_language: sourceLanguage,
+      source_version: sourceVersion,
+      source_code: fileContent,
+      selected_LLM: llmModal,
+    };
+    const requestDataDebug = {
+      source_language: sourceLanguage,
+      source_version: sourceVersion,
+      source_code: fileContent,
+      selected_LLM: llmModal,
+    };
+
+    let endPoint;
+    let data;
+
+    if (active == 1) {
+      data = requestDataTransfer;
+      endPoint = "http://localhost:8080/transferCode";
+    } else if (active == 2) {
+      data = requestDataOptimize;
+      endPoint = "http://localhost:8080/improvePerf";
+    } else if (active == 3) {
+      data = requestDataDebug;
+      endPoint = "http://localhost:8080/fixCode";
+    }
+
+    try {
+      const response = await axios.post(endPoint, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const convertedCode = extractCode(response.data.output);
+      setConvertedCode(convertedCode);
+    } catch (error) {
+      console.error("API 呼叫錯誤：", error);
+      if (error.response) {
+        console.error("錯誤詳細資訊：", error.response.data);
+      }
+    }
   };
 
   return (
