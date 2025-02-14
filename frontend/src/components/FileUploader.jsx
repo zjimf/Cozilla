@@ -1,3 +1,4 @@
+// src/components/FileUploader.js
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import List from "@mui/material/List";
@@ -11,12 +12,11 @@ import Typography from "@mui/material/Typography";
 const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
   const onDrop = useCallback(
     (acceptedFiles) => {
-      // 將新檔案合併進現有檔案
+      // 合併新上傳的檔案，不覆蓋舊檔案
       setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
 
       acceptedFiles.forEach((file) => {
         const reader = new FileReader();
-
         reader.onload = (event) => {
           const fileContent = event.target.result;
           setFileContents((prevContents) => ({
@@ -24,7 +24,6 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
             [file.name]: fileContent,
           }));
         };
-
         reader.readAsText(file);
       });
     },
@@ -33,7 +32,7 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: ".js,.py,.java,.cpp,.txt", // 允許的文件類型
+    accept: ".js,.py,.java,.cpp,.txt", // 允許的檔案類型
   });
 
   const formatSize = (size) => {
@@ -47,30 +46,14 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
   };
 
   return (
-    <>
-      <div
-        {...getRootProps()}
-        style={{
-          background: "#f2f2f2",
-          padding: "20px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <input {...getInputProps()} />
-        <p>拖放或點擊上傳程式碼檔案 (.js, .py, .java, .cpp)</p>
-      </div>
-      {files.length > 0 && (
-        <Box
-          sx={{
-            background: "#f2f2f2",
-            maxHeight: "200px",
-            overflowY: "auto",
-            padding: "10px",
-            position: "relative",
-          }}
-        >
+    <div
+      {...getRootProps()}
+      style={{ border: "2px solid gray", padding: "20px", cursor: "pointer" }}
+    >
+      <input {...getInputProps()} />
+      <p>拖放或點擊上傳程式碼檔案 (.js, .py, .java, .cpp, .txt)</p>
+      <Box>
+        {files.length > 0 && (
           <List>
             {files.map((file, index) => (
               <ListItem
@@ -80,7 +63,7 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => onDelete(file.name)}
+                    onClick={() => onDelete && onDelete(file.name)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -103,9 +86,9 @@ const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
               </ListItem>
             ))}
           </List>
-        </Box>
-      )}
-    </>
+        )}
+      </Box>
+    </div>
   );
 };
 
