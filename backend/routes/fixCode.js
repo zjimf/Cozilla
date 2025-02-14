@@ -22,45 +22,48 @@ async function getAccessToken() {
 }
 
 /**
- * Call Gemini API to fix code errors
+ * Call Gemini API to fix code errors if any.
+ * If the code runs successfully, output the original code.
  */
 async function fixCodeWithGemini(params) {
   try {
-    const {
-      source_language,
-      source_code,
-      target_language,
-      compile_error_details,
-      selected_LLM,
-    } = params;
+    const { source_language, source_version, source_code, selected_LLM } =
+      params;
 
-    const accessToken = await getAccessToken();
-    const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/${selected_LLM}:generateContent`;
-
-    // Construct Prompt
+    // Construct Prompt with source version info
     let prompt = `
-Analyze the following ${source_language} code and correct any compilation or runtime errors to ensure it executes successfully. The corrected version should follow these guidelines:
+Analyze the following ${source_language} code (Version: ${source_version}) and determine if it contains any compilation or runtime errors.
+If the code executes successfully without errors, output the original code unchanged.
+However, if errors are detected, provide a corrected version of the code that is fully functional and free of errors.
+The corrected code must adhere to the following guidelines:
 
-1. The fixed code should be fully functional and free from compilation errors.
-2. It should maintain the original intent and logic of the provided code.
-3. The corrected code must use only standard libraries and follow best coding practices of ${target_language}.
+1. Preserve the original intent and logic of the provided code.
+2. Use only standard libraries and follow best coding practices for ${source_language}.
+3. Ensure that the final code is free from any compilation or runtime errors and executes successfully.
 
-Original ${source_language} Code:
+In your corrected code, please include inline comments to indicate what changes were made and why.
+
+Original ${source_language} Code (Version: ${source_version}):
 ${source_code}
-
 `;
 
-    if (compile_error_details) {
-      prompt += `Identified Compilation Errors: ${compile_error_details}\n`;
-    }
-
     prompt += `
-Please analyze and fix the errors. The final output should be the corrected ${target_language} code, enclosed between the following markers:
-   - Code Start Marker: \`// BEGIN CODE\`
-   - Code End Marker: \`// END CODE\`
+Please output the final ${source_language} code (either the original if no errors, or the corrected version if errors are present) as a markdown code block.
+Additionally, outside of the markdown code block, display the following custom markers to indicate the start and end of the code:
+
+// BEGIN CODE
+
+[Your markdown code block here]
+
+// END CODE
+
+Note: The custom markers should be separate from the markdown code block and should not be included within it.
 `;
 
     // Send request to Vertex AI Gemini API
+    const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/${selected_LLM}:generateContent`;
+    const accessToken = await getAccessToken();
+
     const response = await axios.post(
       MODEL_ENDPOINT,
       {
@@ -74,7 +77,7 @@ Please analyze and fix the errors. The final output should be the corrected ${ta
       }
     );
 
-    // Retrieve LLM-generated corrected code
+    // Retrieve LLM-generated output
     const output =
       response.data.candidates[0]?.content?.parts[0]?.text || "No response";
 
@@ -87,16 +90,11 @@ Please analyze and fix the errors. The final output should be the corrected ${ta
 
 // **API Route - Fix Code**
 router.post("/", async (req, res) => {
-  const {
-    source_language,
-    source_code,
-    target_language,
-    compile_error_details,
-    selected_LLM,
-  } = req.body;
+  const { source_language, source_version, source_code, selected_LLM } =
+    req.body;
 
   // Validate required parameters
-  if (!source_code || !source_language || !target_language || !selected_LLM) {
+  if (!source_code || !source_language || !source_version || !selected_LLM) {
     return res
       .status(400)
       .json({ error: "Please provide all required parameters" });
@@ -105,9 +103,8 @@ router.post("/", async (req, res) => {
   try {
     const output = await fixCodeWithGemini({
       source_language,
+      source_version,
       source_code,
-      target_language,
-      compile_error_details,
       selected_LLM,
     });
     res.json({ message: "Code fixing successful", output });
