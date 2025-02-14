@@ -12,17 +12,22 @@ async function deployToKubernetes() {
     const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
 
     console.log("取得 GKE 憑證...");
-    const getCred = await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
-    console.log("取得 GKE 憑證成功:\n", getCred);
+    await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
+    console.log("取得 GKE 憑證成功");
 
     console.log("執行 kubectl apply...");
     const kubectlApply = await execPromise(`kubectl apply -f ${yamlPath}`);
-    console.log("Kubernetes 資源已部署成功！\n", kubectlApply);
+    console.log("Kubernetes 資源已部署成功！");
 
-    return kubectlApply;
+    return { result: true, message: "" };
   } catch (error) {
     console.error("部署失敗:", error);
-    throw new Error("部署失敗" + (error.cmd ? `於指令: ${error.cmd}` : ''));
+    let errorMessage = "";
+    if (error.cmd.includes("get-credentials")) errorMessage = "獲取憑證失敗";
+    else if (error.cmd.includes("kubectl apply")) errorMessage = "部署環境失敗";
+    else errorMessage = "編譯失敗";
+
+    return { result: false, message: errorMessage };
   }
 }
 
@@ -39,9 +44,9 @@ function execPromise(command) {
 router.post("/", async (req, res) => {
   try {
     const result = await deployToKubernetes();
-    res.json({ message: "Kubernetes 部署成功", result });
+    res.json(result);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ result: false, message: err.message });
   }
 });
 
