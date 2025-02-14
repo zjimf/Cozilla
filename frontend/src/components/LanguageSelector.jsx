@@ -4,7 +4,7 @@ import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 const languageData = {
   java: {
     label: "Java",
-    versions: ["2", "7", "8", "9", "11", "17"],
+    versions: ["2", "7", "8", "9", "11", "17", "21"],
   },
   python: {
     label: "Python",
