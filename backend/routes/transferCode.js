@@ -54,6 +54,7 @@ Please follow these guidelines:
 7. Enclose the final output code within the following custom markers:
    - Code Start Marker: \`// BEGIN CODE\`
    - Code End Marker: \`// END CODE\`
+   
 
 Original ${source_language} code:
 ${source_code}
@@ -76,12 +77,15 @@ Please provide the equivalent ${target_language} code:
     );
 
     // Retrieve LLM-generated converted code
-    const output =
+    let output =
       response.data.candidates[0]?.content?.parts[0]?.text || "No response";
+
+    // Format output as a JSON string for Postman compatibility
+    output = JSON.stringify(output);
 
     return output;
   } catch (error) {
-    console.error("Error calling  API:", error.response?.data || error.message);
+    console.error("Error calling API:", error.response?.data || error.message);
     throw new Error("GCP API call failed");
   }
 }
