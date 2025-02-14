@@ -64,7 +64,7 @@ const ProcessSectionSetting = () => {
         }}
       >
         <Stack spacing={5} direction="column">
-          <ProcessSectionRenderContent active={active} />
+          <ProcessSectionRenderContent active={active} currentStep={1} />
         </Stack>
       </Box>
     </Box>

@@ -10,12 +10,11 @@ const ProcessSectionRenderContent = ({ active }) => {
   const [targetVersion, setTargetVersion] = useState("");
   const [llmModal, setLlmModal] = useState("");
 
-  // 檢查是否所有必要欄位都有填寫
   const canGo =
     sourceLanguage &&
     sourceVersion &&
     llmModal &&
-    (active === 2 || (targetLanguage && targetVersion));
+    (active !== 1 || (targetLanguage && targetVersion));
 
   const handleGo = () => {
     // 在此可以處理下一步的邏輯，例如傳遞參數到下一個區塊或進行 API 呼叫
@@ -39,7 +38,7 @@ const ProcessSectionRenderContent = ({ active }) => {
         version={sourceVersion}
         setVersion={setSourceVersion}
       />
-      {active !== 2 && (
+      {active === 1 && (
         <>
           <Typography gutterBottom sx={{ fontWeight: "bold" }}>
             欲轉換程式
@@ -69,7 +68,7 @@ const ProcessSectionRenderContent = ({ active }) => {
           variant="contained"
           onClick={handleGo}
           disabled={!canGo}
-          sx={{ width: "80px", height: "40px" }}
+          sx={{ width: "80px", height: "40px", marginRight: "10px" }}
         >
           Go
         </Button>
