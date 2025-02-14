@@ -52,8 +52,8 @@ async function convertCodeWithGemini(params) {
     If not, prioritize optimizing one of the conditions.
     
     Enclose the final output code within the following custom markers:
-       - Code Start Marker: \`// BEGIN CODE\`
-       - Code End Marker: \`// END CODE\`
+       - Code Start Marker: // BEGIN CODE
+       - Code End Marker: // END CODE
     `;
 
     // Send request to Vertex AI Gemini API

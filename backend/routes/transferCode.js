@@ -52,8 +52,8 @@ Please follow these guidelines:
 5. Follow best practices and coding styles for the target language (e.g., Pythonic style for Python, conventional Java coding conventions).
 6. If there are syntax or functional differences that cannot be directly translated, suggest reasonable alternatives or equivalent implementations.
 7. Enclose the final output code within the following custom markers:
-   - Code Start Marker: \`// BEGIN CODE\`
-   - Code End Marker: \`// END CODE\`
+   - Code Start Marker: // BEGIN CODE
+   - Code End Marker: // END CODE
 
 Original ${source_language} code:
 ${source_code}
