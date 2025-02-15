@@ -25,6 +25,9 @@ export const extractCode = (raw) => {
   // 5. 將字串中的 literal "\n" 轉換為真正的換行符號
   const formattedCode = codeContent.replace(/\\n/g, "\n");
 
-  // 6. 回傳處理後的程式碼（內含 \n 換行）
-  return formattedCode;
+  // 6. 將轉義的雙引號 \" 轉回正常的雙引號 "
+  const unescapedCode = formattedCode.replace(/\\"/g, '"');
+
+  // 7. 回傳處理後的程式碼（內含正確換行與正常雙引號）
+  return unescapedCode;
 };
