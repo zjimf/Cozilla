@@ -47,26 +47,14 @@ const ProcessSectionRenderContent = ({
       selected_LLM: llmModal,
     };
 
-    let endPoint;
-    let data;
-
-    if (active == 1) {
-      transferProcess(active, requestDataTransfer, setConvertedCode);
-    } else if (active == 2) {
-      transferProcess(active, requestDataOptimize, setConvertedCode);
-    } else if (active == 3) {
-      transferProcess(active, requestDataDebug, setConvertedCode);
-    }
-
     try {
-      const response = await axios.post(endPoint, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const convertedCode = extractCode(response.data.output);
-      setConvertedCode(convertedCode);
+      if (active == 1) {
+        transferProcess(active, requestDataTransfer, setConvertedCode);
+      } else if (active == 2) {
+        transferProcess(active, requestDataOptimize, setConvertedCode);
+      } else if (active == 3) {
+        transferProcess(active, requestDataDebug, setConvertedCode);
+      }
     } catch (error) {
       console.error("API 呼叫錯誤：", error);
       if (error.response) {
