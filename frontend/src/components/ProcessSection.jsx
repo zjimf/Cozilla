@@ -19,6 +19,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 // 單一檔案的展開區塊元件
 const TransferSectionItem = ({ file, fileContent }) => {
+  const [active, setActive] = useState(1);
+
   const [open, setOpen] = useState(true);
   // 控制分頁，預設為原始程式碼
   const [tabValue, setTabValue] = useState("original");
@@ -33,7 +35,41 @@ const TransferSectionItem = ({ file, fileContent }) => {
     setTabValue(newValue);
   };
 
-  const [active, setActive] = useState(1);
+  const handleDownload = (name, fileContent) => {
+    let fileExtension = "txt"; // 預設為 txt
+
+    // 偵測是否為 Java 程式碼
+    if (
+      fileContent.includes("import java") ||
+      fileContent.includes("public class") ||
+      fileContent.includes("package ")
+    ) {
+      fileExtension = "java";
+    }
+    // 偵測是否為 Python 程式碼（這裡簡單檢查 def 或特定 import 語法）
+    else if (
+      fileContent.includes("def ") ||
+      (fileContent.includes("import ") && fileContent.includes(":"))
+    ) {
+      fileExtension = "py";
+    }
+
+    // 建立 Blob 物件（這邊使用純文字格式）
+    const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+    // 產生一個指向 Blob 的 URL
+    const url = URL.createObjectURL(blob);
+
+    // 建立一個臨時的 <a> 標籤，並設定下載屬性
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name}_converted.${fileExtension}`;
+    // 將 <a> 標籤加入文件中，模擬點擊進行下載
+    document.body.appendChild(a);
+    a.click();
+    // 下載後清除 <a> 標籤及釋放 URL 物件
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Box sx={{ mb: 2 }}>
@@ -124,6 +160,9 @@ const TransferSectionItem = ({ file, fileContent }) => {
 
                           <DownloadIcon
                             sx={{ cursor: "pointer", marginX: "5px" }}
+                            onClick={() =>
+                              handleDownload(file.name, convertedCode)
+                            }
                           />
                         </Box>
                         <CodeBlock code={convertedCode} language="python" />

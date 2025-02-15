@@ -1,6 +1,5 @@
 import axios from "axios";
 import { extractCode } from "../functions/extractCode.js";
-import { formatCode } from "./formatCode.js";
 
 export const transferProcess = async (active, data, setConvertedCode) => {
   try {
@@ -17,6 +16,8 @@ export const transferProcess = async (active, data, setConvertedCode) => {
       );
       console.log("transfer API 回傳：", transferResponse.data.output);
       const convertedCode = extractCode(transferResponse.data.output);
+      console.log(convertedCode);
+      setConvertedCode(convertedCode);
 
       // test
       data.converted_code = transferResponse.data.output;
@@ -30,8 +31,6 @@ export const transferProcess = async (active, data, setConvertedCode) => {
         }
       );
       console.log("test API 回傳：", responseTest.data);
-
-      setConvertedCode(convertedCode);
     } else if (active == 2) {
       //improve
       const improveResponse = await axios.post(
