@@ -8,6 +8,8 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import DownloadIcon from "@mui/icons-material/Download";
 import MedicationIcon from "@mui/icons-material/Medication";
+import ReportModal from "./ReportModal";
+import { parseReportText } from "../functions/parseReportText";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
@@ -19,13 +21,17 @@ const Item = styled(Paper)(({ theme }) => ({
 
 // 單一檔案的展開區塊元件
 const TransferSectionItem = ({ file, fileContent }) => {
+  const [openReport, setOpenReport] = useState(false);
+
   const [active, setActive] = useState(1);
 
   const [open, setOpen] = useState(true);
-  // 控制分頁，預設為原始程式碼
+
   const [tabValue, setTabValue] = useState("original");
 
   const [convertedCode, setConvertedCode] = useState("");
+
+  const [reportRawText, setReportRawText] = useState("");
 
   const handleChipClick = () => {
     setOpen(!open);
@@ -71,6 +77,10 @@ const TransferSectionItem = ({ file, fileContent }) => {
     URL.revokeObjectURL(url);
   };
 
+  const handleClickOpen = () => setOpenReport(true);
+
+  const handleClose = () => setOpenReport(false);
+
   return (
     <Box sx={{ mb: 2 }}>
       <Chip
@@ -90,6 +100,7 @@ const TransferSectionItem = ({ file, fileContent }) => {
                   setTabValue={setTabValue}
                   active={active}
                   setActive={setActive}
+                  setReportRawText={setReportRawText}
                 />
               </Item>
             </Grid>
@@ -153,9 +164,17 @@ const TransferSectionItem = ({ file, fileContent }) => {
                           }}
                         >
                           {active === 2 && (
-                            <MedicationIcon
-                              sx={{ cursor: "pointer", marginX: "5px" }}
-                            />
+                            <>
+                              <MedicationIcon
+                                sx={{ cursor: "pointer", marginX: "5px" }}
+                                onClick={handleClickOpen}
+                              />
+                              <ReportModal
+                                open={openReport}
+                                onClose={handleClose}
+                                reportData={parseReportText(reportRawText)}
+                              />
+                            </>
                           )}
 
                           <DownloadIcon

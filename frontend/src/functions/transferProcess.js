@@ -1,7 +1,12 @@
 import axios from "axios";
 import { extractCode } from "../functions/extractCode.js";
 
-export const transferProcess = async (active, data, setConvertedCode) => {
+export const transferProcess = async (
+  active,
+  data,
+  setConvertedCode,
+  setReportRawText
+) => {
   try {
     if (active == 1) {
       //transfer
@@ -69,6 +74,7 @@ export const transferProcess = async (active, data, setConvertedCode) => {
         }
       );
       console.log("report API 回傳：", report.data);
+      setReportRawText(report.data.output);
 
       setConvertedCode(convertedCode);
     } else if (active == 3) {

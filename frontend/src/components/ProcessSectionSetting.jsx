@@ -12,6 +12,7 @@ const ProcessSectionSetting = ({
   setTabValue,
   active,
   setActive,
+  setReportRawText,
 }) => {
   const handleClick = (button) => {
     setActive(button);
@@ -74,6 +75,7 @@ const ProcessSectionSetting = ({
             active={active}
             currentStep={1}
             setTabValue={setTabValue}
+            setReportRawText={setReportRawText}
           />
         </Stack>
       </Box>

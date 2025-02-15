@@ -11,6 +11,7 @@ const ProcessSectionRenderContent = ({
   setConvertedCode,
   active,
   setTabValue,
+  setReportRawText,
 }) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [sourceVersion, setSourceVersion] = useState("");
@@ -51,7 +52,12 @@ const ProcessSectionRenderContent = ({
       if (active == 1) {
         transferProcess(active, requestDataTransfer, setConvertedCode);
       } else if (active == 2) {
-        transferProcess(active, requestDataOptimize, setConvertedCode);
+        transferProcess(
+          active,
+          requestDataOptimize,
+          setConvertedCode,
+          setReportRawText
+        );
       } else if (active == 3) {
         transferProcess(active, requestDataDebug, setConvertedCode);
       }
