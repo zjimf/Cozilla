@@ -4,11 +4,13 @@ import LanguageSelector from "./LanguageSelector.jsx";
 import LLMSelector from "./LLMSelector.jsx";
 import axios from "axios";
 import { extractCode } from "../functions/extractCode.js";
+import { transferProcess } from "../functions/transferProcess.js";
 
 const ProcessSectionRenderContent = ({
   fileContent,
   setConvertedCode,
   active,
+  setTabValue,
 }) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [sourceVersion, setSourceVersion] = useState("");
@@ -23,6 +25,7 @@ const ProcessSectionRenderContent = ({
     (active !== 1 || (targetLanguage && targetVersion));
 
   const handleGo = async () => {
+    setTabValue("converted");
     const requestDataTransfer = {
       source_language: sourceLanguage,
       target_language: targetLanguage,
@@ -48,14 +51,11 @@ const ProcessSectionRenderContent = ({
     let data;
 
     if (active == 1) {
-      data = requestDataTransfer;
-      endPoint = "http://localhost:8080/transferCode";
+      transferProcess(active, requestDataTransfer, setConvertedCode);
     } else if (active == 2) {
-      data = requestDataOptimize;
-      endPoint = "http://localhost:8080/improvePerf";
+      transferProcess(active, requestDataOptimize, setConvertedCode);
     } else if (active == 3) {
-      data = requestDataDebug;
-      endPoint = "http://localhost:8080/fixCode";
+      transferProcess(active, requestDataDebug, setConvertedCode);
     }
 
     try {

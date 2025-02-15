@@ -6,9 +6,13 @@ import Stack from "@mui/material/Stack";
 
 import ProcessSectionRenderContent from "./ProcessSectionRenderContent";
 
-const ProcessSectionSetting = ({ fileContent, setConvertedCode }) => {
-  const [active, setActive] = useState(1);
-
+const ProcessSectionSetting = ({
+  fileContent,
+  setConvertedCode,
+  setTabValue,
+  active,
+  setActive,
+}) => {
   const handleClick = (button) => {
     setActive(button);
   };
@@ -69,6 +73,7 @@ const ProcessSectionSetting = ({ fileContent, setConvertedCode }) => {
             setConvertedCode={setConvertedCode}
             active={active}
             currentStep={1}
+            setTabValue={setTabValue}
           />
         </Stack>
       </Box>
