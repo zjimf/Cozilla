@@ -7,7 +7,7 @@ spec:
   containers:
   - name: b1-1
     image: python:3.6
-    command: ["python", "B1_1.py"]
+    command: ["python", "/app/b1_1.py"]
     resources:
       limits:
         cpu: 100m
@@ -17,23 +17,30 @@ spec:
         memory: 128Mi
     livenessProbe:
       exec:
-        command:
-        - python
-        - -c
-        - "import sys; sys.exit(0) if 'Alice' in open('output.txt').read() else sys.exit(1)" # Check for expected output
+        command: ["python", "-c", "import sys; sys.exit(0)"]
       initialDelaySeconds: 5
       periodSeconds: 10
     readinessProbe:
       exec:
-        command:
-        - python
-        - -c
-        - "import sys; sys.exit(0)" # Simple check if the process is running
+        command: ["python", "-c", "import sys; sys.exit(0)"]
       initialDelaySeconds: 5
       periodSeconds: 10
     volumeMounts:
-    - name: output-volume
+    - name: code-volume
       mountPath: /app
   volumes:
-  - name: output-volume
-    emptyDir: {} # Use emptyDir for ephemeral storage
+  - name: code-volume
+    configMap:
+      name: b1-1-configmap
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: b1-1-configmap
+data:
+  b1_1.py: |
+    def greet(name):
+        print(f"Hello, {name}!")
+
+    if __name__ == "__main__":
+        greet("Alice")

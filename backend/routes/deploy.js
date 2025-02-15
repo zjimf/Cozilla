@@ -7,30 +7,46 @@ const path = require('path');
 
 router.use(bodyParser.json());
 
-async function deployToKubernetes() {
-  try {
-    const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
+async function deployToCloudRun() {
+    try {
+    //   console.log("🔹 連接至 GCP VM...");
+    //   await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap`);
+    //   console.log("✔️ 成功: 連接至 GCP VM");
 
-    console.log("取得 GKE 憑證...");
-    await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
-    console.log("取得 GKE 憑證成功");
+      console.log("🔹 取得 GKE 憑證...");
+      await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet --command "gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2"`);
+      console.log("✔️ 成功: 取得 GKE 憑證");
 
-    console.log("執行 kubectl apply...");
-    const kubectlApply = await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet--command "kubectl apply -f /home/tsid_user06_tsmc_hackathon_cloud/Cozilla/backend/routes/generated_yaml.yaml"`);
-    console.log("Kubernetes 資源已部署成功！");
+      console.log("🔹 執行 kubectl apply...");
+      await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet --command "kubectl apply -f /home/tsid_user06_tsmc_hackathon_cloud/Cozilla/backend/generated_yaml/deploy.yaml"`);
+      console.log("✔️ 成功: 執行 kubectl apply");
+  
+    //   console.log("🔹 推送 Docker 映像...");
+    //   await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet--command "gcloud builds submit --tag us-central1-docker.pkg.dev/tsmccareerhack2025-tsid-grp2/repo-name/cloudrun-app"`);
+    //   console.log("✔️ 成功: 推送 Docker 映像");
 
-    return { result: true, message: "" };
-  } catch (error) {
-    console.error("部署失敗:", error);
-    let errorMessage = "";
-    if (error.cmd.includes("get-credentials")) errorMessage = "獲取憑證失敗";
-    else if (error.cmd.includes("kubectl apply")) errorMessage = "部署環境失敗";
-    else errorMessage = "編譯失敗";
+    //   console.log("🔹 部署至 Cloud Run...");
+    //   await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet--command "gcloud run deploy cloudrun-app --image us-central1-docker.pkg.dev/tsmccareerhack2025-tsid-grp2/repo-name/cloudrun-app --platform managed --region us-central1 --allow-unauthenticated"`);
+    //   console.log("✔️ 成功: 部署至 Cloud Run");
+  
+      console.log("✅ 部署成功！");
+      return { result: true, message: "" };
+    // console.log("🔹 透過 SSH 連接 GCP VM 並執行所有指令...");
+    // await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --command "
+    //   gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2 &&
+    //   kubectl apply -f /home/tsid_user06_tsmc_hackathon_cloud/Cozilla/backend/routes/generated_yaml.yaml &&
+    //   gcloud builds submit --tag us-central1-docker.pkg.dev/tsmccareerhack2025-tsid-grp2/repo-name/cloudrun-app &&
+    //   gcloud run deploy cloudrun-app --image us-central1-docker.pkg.dev/tsmccareerhack2025-tsid-grp2/repo-name/cloudrun-app --platform managed --region us-central1 --allow-unauthenticated"
+    // `);
 
-    return { result: false, message: errorMessage };
+    // console.log("✅ 部署成功！");
+    // return { result: true, message: "" };
+    } catch (error) {
+      console.error("部署失敗:", error);
+      return { result: false, message: `部署失敗於: ${error.cmd}` };
+    }
   }
-}
-
+  
 function execPromise(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -43,7 +59,7 @@ function execPromise(command) {
 
 router.post("/", async (req, res) => {
   try {
-    const result = await deployToKubernetes();
+    const result = await deployToCloudRun();
     res.json(result);
   } catch (err) {
     res.status(500).json({ result: false, message: err.message });
