@@ -150,7 +150,7 @@ async function generateK8sYaml(language, version, code_snippet) {
 
     // 寫入檔案
     const path = require('path');
-    const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
+    const yamlPath = path.join(__dirname, '.././generated_yaml/deploy.yaml');
     fs.writeFileSync(yamlPath, yamlContent);  // 將 YAML 內容寫入檔案
 x``
     return yamlOutput;
@@ -165,34 +165,24 @@ x``
 
 // **API 路由 - 與 Gemini LLM 進行對話**
 router.post("/", async (req, res) => {
-  const { code_snippet } = req.body;
+  const { language, version, code_snippet } = req.body;
 
-  if (!code_snippet) {
-    return res.status(400).json({ error: "Do not include code snippet in req.body" });
+  if (!code_snippet || !language || !version) {
+    return res.status(400).json({ error: "Do not include all column in req.body" });
   } else{
     try {
       // Step1. 偵測 code_snippet 語言
-      const language = await detectLanguage(code_snippet);
-      console.log(`=========== detectLanguage success!!===========\n detected Language: ${language}`);
+      // const language = await detectLanguage(code_snippet);
+      // console.log(`=========== detectLanguage success!!===========\n detected Language: ${language}`);
 
       // Step2. 偵測 code_snippet 版本
-      const version = await detectVersion(code_snippet);
-      console.log(`=========== detectVersion success!!===========\n detected Version: ${version}`);
+      // const version = await detectVersion(code_snippet);
+      // console.log(`=========== detectVersion success!!===========\n detected Version: ${version}`);
 
       // Step3. 生成 yaml 檔案
       const yaml = await generateK8sYaml(language, version, code_snippet);
       console.log(`=========== generateK8sYaml success!!===========\n generateK8sYaml: ${yaml}`);
       res.json({ message: "generateK8sYaml success!!", response: yaml });
-
-      // Step4. 建雲環境
-      
-      // 確保只有一個 res.json() 回應
-      // res.json({ 
-      //   message: "All steps completed successfully", 
-      //   language, 
-      //   version, 
-      //   yaml 
-      // });
     } catch (err) {
       res.status(500).json({ error: err.toString() });
     }
