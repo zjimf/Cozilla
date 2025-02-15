@@ -9,6 +9,7 @@ router.use(bodyParser.json());
 // Google Cloud Vertex AI API 設定
 const PROJECT_ID = "tsmccareerhack2025-tsid-grp2"; // GCP 專案 ID
 const MODEL_ENDPOINT = `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/gemini-1.5-pro-002:generateContent`;
+const fs = require("fs");
 
 /**
  * 取得 Google Cloud API 的 Access Token
@@ -126,6 +127,7 @@ async function generateK8sYaml(language, version, code_snippet) {
     "- Include appropriate resource limits.\n"
     "- Add liveness and readiness probes for health checks.\n"
     "- Use the file name as the container name.\n"
+    "- **Ensure restartPolicy is set to "Never" for one-time execution scripts.**"
     "- Output format: Provide the full Kubernetes YAML configuration.\n\n"
     "Code snippet:\n${code_snippet}"`;
 
@@ -153,8 +155,7 @@ async function generateK8sYaml(language, version, code_snippet) {
     // 寫入檔案
     const path = require('path');
     const yamlPath = path.join(__dirname, '.././generated_yaml/deploy.yaml');
-    fs.writeFileSync(yamlPath, yamlContent);  // 將 YAML 內容寫入檔案
-x``
+    fs.writeFileSync(yamlPath, yamlOutput);  // 將 YAML 內容寫入檔案
     return yamlOutput;
   } catch (error) {
     console.error(
@@ -191,7 +192,7 @@ router.post("/", async (req, res) => {
       // Step3. 生成 yaml 檔案
       const yaml = await generateK8sYaml(language, version, code_snippet);
       console.log(
-        `=========== generateK8sYaml success!!===========\n generateK8sYaml: ${yaml}`
+        `=========== generateK8sYaml success!!===========\n`
       );
       res.json({ message: "generateK8sYaml success!!", response: yaml });
     } catch (err) {

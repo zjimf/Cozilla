@@ -10,13 +10,13 @@ router.use(bodyParser.json());
 async function deployToKubernetes() {
   try {
     const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
-    
+
     console.log("取得 GKE 憑證...");
     await execPromise(`gcloud container clusters get-credentials careerhack-cluster-tsid --zone us-central1-a --project tsmccareerhack2025-tsid-grp2`);
     console.log("取得 GKE 憑證成功");
 
     console.log("執行 kubectl apply...");
-    const kubectlApply = await execPromise(`kubectl apply -f ${yamlPath}`);
+    const kubectlApply = await execPromise(`gcloud compute ssh tsid_user06_tsmc_hackathon_cloud@gce-instance --zone us-central1-a --tunnel-through-iap --quiet--command "kubectl apply -f /home/tsid_user06_tsmc_hackathon_cloud/Cozilla/backend/routes/generated_yaml.yaml"`);
     console.log("Kubernetes 資源已部署成功！");
 
     return { result: true, message: "" };
