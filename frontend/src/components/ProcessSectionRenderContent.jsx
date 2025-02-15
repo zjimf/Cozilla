@@ -79,7 +79,7 @@ const ProcessSectionRenderContent = ({
       }}
     >
       <Typography gutterBottom sx={{ fontWeight: "bold" }}>
-        原始程式
+        Original Code
       </Typography>
       <LanguageSelector
         language={sourceLanguage}
@@ -90,7 +90,7 @@ const ProcessSectionRenderContent = ({
       {active === 1 && (
         <>
           <Typography gutterBottom sx={{ fontWeight: "bold" }}>
-            欲轉換程式
+            convert to
           </Typography>
           <LanguageSelector
             language={targetLanguage}
@@ -101,7 +101,7 @@ const ProcessSectionRenderContent = ({
         </>
       )}
       <Typography gutterBottom sx={{ fontWeight: "bold" }}>
-        欲選用 LLM
+        Model you want to use
       </Typography>
       <Box
         sx={{

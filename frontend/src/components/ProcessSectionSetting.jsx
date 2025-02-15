@@ -31,7 +31,7 @@ const ProcessSectionSetting = ({
             },
           }}
         >
-          轉換
+          Convert
         </Button>
         <Button
           onClick={() => handleClick(2)}
@@ -43,7 +43,7 @@ const ProcessSectionSetting = ({
             },
           }}
         >
-          優化
+          Optimize
         </Button>
         <Button
           onClick={() => handleClick(3)}
@@ -55,7 +55,7 @@ const ProcessSectionSetting = ({
             },
           }}
         >
-          偵錯
+          Debug
         </Button>
       </ButtonGroup>
 

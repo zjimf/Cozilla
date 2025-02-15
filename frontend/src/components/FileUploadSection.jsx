@@ -13,7 +13,7 @@ const FileUploadSection = ({
   return (
     <Box>
       <Typography gutterBottom variant="h5" component="div">
-        檔案上傳
+        File upload
       </Typography>
       <FileUploader
         files={files}

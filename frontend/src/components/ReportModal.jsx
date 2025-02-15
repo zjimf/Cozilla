@@ -40,8 +40,8 @@ const ReportModal = ({ open, onClose, reportData }) => {
   for (let n = 1; n <= 5; n++) {
     timeChartData.push({
       n: n, // X 軸為 n 值
-      原始程式: originalTimeFunc(n),
-      優化後程式: convertedTimeFunc(n),
+      Original: originalTimeFunc(n),
+      Optimized: convertedTimeFunc(n),
     });
   }
 
@@ -52,19 +52,19 @@ const ReportModal = ({ open, onClose, reportData }) => {
   };
   const spaceChartData = [
     {
-      name: "空間複雜度",
-      原始程式: spaceValueMapping(reportData.sourceSpace),
-      優化後程式: spaceValueMapping(reportData.convertedSpace),
+      name: "Space Complexity",
+      Original: spaceValueMapping(reportData.sourceSpace),
+      Optimized: spaceValueMapping(reportData.convertedSpace),
     },
   ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>程式轉換分析報表</DialogTitle>
+      <DialogTitle>Program conversion analysis report</DialogTitle>
       <DialogContent dividers>
         <Box mb={3}>
           <Typography variant="h6" gutterBottom>
-            時間複雜度
+            Time complexity
           </Typography>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={timeChartData}>
@@ -77,14 +77,14 @@ const ReportModal = ({ open, onClose, reportData }) => {
               <Legend />
               <Line
                 type="monotone"
-                dataKey="原始程式"
+                dataKey="Original"
                 stroke="#8884d8"
                 strokeWidth={2}
                 activeDot={{ r: 8 }}
               />
               <Line
                 type="monotone"
-                dataKey="優化後程式"
+                dataKey="Optimized"
                 stroke="#82ca9d"
                 strokeWidth={2}
                 activeDot={{ r: 8 }}
@@ -101,16 +101,16 @@ const ReportModal = ({ open, onClose, reportData }) => {
         {/* 空間複雜度區塊 (合併在一起的群組柱狀圖) */}
         <Box mb={3}>
           <Typography variant="h6" gutterBottom>
-            空間複雜度
+            Space Complexity
           </Typography>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={spaceChartData}>
-              <XAxis dataKey="name" />
+              <XAxis />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="原始程式" fill="#82ca9d" />
-              <Bar dataKey="優化後程式" fill="#8884d8" />
+              <Bar dataKey="Original" fill="#82ca9d" />
+              <Bar dataKey="Optimized" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
           <Box mt={2}>

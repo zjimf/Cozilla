@@ -9,13 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-const FileUploader = ({
-  files,
-  setFiles,
-  fileContents,
-  setFileContents,
-  onDelete,
-}) => {
+const FileUploader = ({ files, setFiles, setFileContents, onDelete }) => {
   const onDrop = useCallback(
     (acceptedFiles) => {
       // 合併新上傳的檔案，不覆蓋舊檔案
@@ -63,7 +57,7 @@ const FileUploader = ({
       style={{ border: "2px solid gray", padding: "20px", cursor: "pointer" }}
     >
       <input {...getInputProps()} />
-      <p>拖放或點擊上傳程式碼檔案 (.js, .py, .java, .cpp, .txt)</p>
+      <p>Drag and drop or click to upload code files ( .py, .java)</p>
       <Box>
         {files.length > 0 && (
           <List>
@@ -82,15 +76,16 @@ const FileUploader = ({
                 }
               >
                 <ListItemText
-                  primary={`檔名：${file.name}`}
+                  primary={`File: ${file.name}`}
                   secondary={
                     <>
                       <Typography component="span" variant="body2">
-                        大小：{formatSize(file.size)}
+                        Size：{formatSize(file.size)}
                       </Typography>
                       <br />
                       <Typography component="span" variant="body2">
-                        修改時間：{new Date(file.lastModified).toLocaleString()}
+                        Last modified time：
+                        {new Date(file.lastModified).toLocaleString("en-US")}
                       </Typography>
                     </>
                   }
