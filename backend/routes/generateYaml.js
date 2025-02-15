@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const router = express.Router();
 const axios = require("axios");
 const { GoogleAuth } = require("google-auth-library");
@@ -38,7 +38,7 @@ async function detectLanguage(code_snippet) {
     "- Fields:\n"
     "  * language: Specify 'python' or 'java'.\n"
     "  * confidence: Provide a confidence score (e.g., 0.95).\n\n"
-    "Code snippet:\n${code_snippet}"`
+    "Code snippet:\n${code_snippet}"`;
 
     // 發送請求至 Vertex AI Gemini API
     const response = await axios.post(
@@ -55,12 +55,13 @@ async function detectLanguage(code_snippet) {
     );
 
     // 取得 LLM 產生的回應
-    let output = response.data.candidates[0]?.content?.parts[0]?.text || "no response";
-    output = output.replace(/```json|```/g, '');  // 清除多餘的 Markdown 符號
-    confidence = JSON.parse(output).confidence
-    language = JSON.parse(output).language
+    let output =
+      response.data.candidates[0]?.content?.parts[0]?.text || "no response";
+    output = output.replace(/```json|```/g, ""); // 清除多餘的 Markdown 符號
+    confidence = JSON.parse(output).confidence;
+    language = JSON.parse(output).language;
     // FIXME：信任值很低時還要相信這個結果嗎？
-      return language;
+    return language;
   } catch (error) {
     console.error(
       "Call Gemini API in detectLanguage error:",
@@ -143,16 +144,17 @@ async function generateK8sYaml(language, version, code_snippet) {
     );
 
     // 取得 LLM 產生的回應
-    let output = response.data.candidates[0]?.content?.parts[0]?.text || "無回應";
-    let yamlOutput = output.replace(/.*?```yaml|```[\s\S]*/g, '').trim();  // 僅保留 YAML 內容
+    let output =
+      response.data.candidates[0]?.content?.parts[0]?.text || "無回應";
+    let yamlOutput = output.replace(/.*?```yaml|```[\s\S]*/g, "").trim(); // 僅保留 YAML 內容
     // confidence = JSON.parse(output).confidence
     // language = JSON.parse(output).language
 
     // 寫入檔案
-    const path = require('path');
-    const yamlPath = path.join(__dirname, 'generated_yaml.yaml');
-    fs.writeFileSync(yamlPath, yamlContent);  // 將 YAML 內容寫入檔案
-x``
+    const path = require("path");
+    const yamlPath = path.join(__dirname, "generated_yaml.yaml");
+    fs.writeFileSync(yamlPath, yamlContent); // 將 YAML 內容寫入檔案
+    x``;
     return yamlOutput;
   } catch (error) {
     console.error(
@@ -165,39 +167,47 @@ x``
 
 // **API 路由 - 與 Gemini LLM 進行對話**
 router.post("/", async (req, res) => {
+  console.log(req);
   const { code_snippet } = req.body;
 
   if (!code_snippet) {
-    return res.status(400).json({ error: "Do not include code snippet in req.body" });
-  } else{
+    return res
+      .status(400)
+      .json({ error: "Do not include code snippet in req.body" });
+  } else {
     try {
       // Step1. 偵測 code_snippet 語言
       const language = await detectLanguage(code_snippet);
-      console.log(`=========== detectLanguage success!!===========\n detected Language: ${language}`);
+      console.log(
+        `=========== detectLanguage success!!===========\n detected Language: ${language}`
+      );
 
       // Step2. 偵測 code_snippet 版本
       const version = await detectVersion(code_snippet);
-      console.log(`=========== detectVersion success!!===========\n detected Version: ${version}`);
+      console.log(
+        `=========== detectVersion success!!===========\n detected Version: ${version}`
+      );
 
       // Step3. 生成 yaml 檔案
       const yaml = await generateK8sYaml(language, version, code_snippet);
-      console.log(`=========== generateK8sYaml success!!===========\n generateK8sYaml: ${yaml}`);
+      console.log(
+        `=========== generateK8sYaml success!!===========\n generateK8sYaml: ${yaml}`
+      );
       res.json({ message: "generateK8sYaml success!!", response: yaml });
 
       // Step4. 建雲環境
-      
+
       // 確保只有一個 res.json() 回應
-      // res.json({ 
-      //   message: "All steps completed successfully", 
-      //   language, 
-      //   version, 
-      //   yaml 
+      // res.json({
+      //   message: "All steps completed successfully",
+      //   language,
+      //   version,
+      //   yaml
       // });
     } catch (err) {
       res.status(500).json({ error: err.toString() });
     }
   }
-
 });
 
 module.exports = router;
