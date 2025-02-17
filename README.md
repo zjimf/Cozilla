@@ -1,7 +1,7 @@
 # Cozilla - AI Maintenance Assistant
 
 <p align="center">
-  <img src="https://i.imgur.com/5HrjqyP.png" alt="Imgur" width="100">
+  <img src="https://i.imgur.com/5HrjqyP.png" alt="Imgur" width="250">
 </p>
 
 This project is a submission for the 2025 TSMC IT CareerHack competition, under the theme **AI Maintenance Assistant**. Our goal is to leverage AI technology to automate the transformation and optimization of code and architectures, helping enterprises dynamically adjust their IT environments to meet the needs of different regions as they expand globally, ensuring stable system operation.
